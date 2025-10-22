@@ -1,0 +1,10 @@
+aiogram
+SQLAlchemy
+pydantic-settings
+ffmpeg-python
+python-gettext
+async-lru
+aiofiles
+aiohttp
+PyYAML
+aiosqlite

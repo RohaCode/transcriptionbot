@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python/
+env/
+venc/
+.venv/
+VENV/
+venv.bak/
+.env
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# My specific folders
+
+# VS Code
+.vscode/
