@@ -46,8 +46,8 @@ Telegram-бот для автоматической транскрипции а�
 
 1. **Клонирование репозитория**:
    ```bash
-   git clone <repository-url>
-   cd trans
+   git clone https://github.com/RohaCode/transcriptionbot.git
+   cd transcriptionbot
    ```
 
 2. **Установка зависимостей**:
