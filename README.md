@@ -62,8 +62,8 @@ Telegram-бот для автоматической транскрипции а�
    - `BOT_TOKEN` - Токен Telegram бота
    - `ADMIN_IDS` - ID администраторов (через запятую)
    - `PAYMENT_TOKEN` - Токен для оплаты (если используется)
-   - `DATABASE_URL` - URL для подключения к базе данных
-   - `SPEECHMATICS_API_URL` - URL для Speechmatics API ( sqlite:///./data/bot.db)
+   - `DATABASE_URL` - URL для подключения к базе данных ( sqlite:///./data/bot.db)
+   - `SPEECHMATICS_API_URL` - URL для Speechmatics API
    - `DEFAULT_LANGUAGE` - ru
 
 4. **Инициализация базы данных**:
