@@ -150,5 +150,9 @@
     "validation_api_key_too_short": "API key is too short",
     "validation_api_key_too_long": "API key is too long",
     "validation_api_key_invalid_characters": "API key contains invalid characters",
-    "unknown_command": "I don't understand this command."
+    "unknown_command": "I don't understand this command.",
+    "user_rate_limited_generic": "The transcription service is temporarily overloaded. Please try again in a few minutes.",
+    "admin_rate_limited_notification": "Attention! The bot is receiving a 429 (Rate Limited) error from the Speechmatics API. Request limits may have been exceeded or optimization is required.",
+    "user_internal_server_error_generic": "Transcription failed due to an internal service error. Please try again later.",
+    "admin_internal_server_error_notification": "Attention! Speechmatics API returned a 500 (Internal Server Error). Possible temporary issues on the service side."
 }

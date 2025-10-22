@@ -150,5 +150,12 @@
     "validation_api_key_too_short": "API-ключ слишком короткий",
     "validation_api_key_too_long": "API-ключ слишком длинный",
     "validation_api_key_invalid_characters": "API-ключ содержит недопустимые символы",
-    "unknown_command": "Я не понимаю эту команду."
+    "unknown_command": "Я не понимаю эту команду.",
+    "admin_api_key_invalid": "Внимание! Проблема с API-ключом Speechmatics. Проверьте его в настройках.",
+    "user_transcription_failed_generic": "Не удалось выполнить транскрипцию. Пожалуйста, попробуйте позже.",
+    "transcription_no_text_found": "В вашем файле отсутствует текст. Пожалуйста, отправьте другой файл.",
+    "user_rate_limited_generic": "Сервис транскрипции временно перегружен. Пожалуйста, попробуйте повторить запрос через несколько минут.",
+    "admin_rate_limited_notification": "Внимание! Бот получает ошибку 429 (Rate Limited) от Speechmatics API. Возможно, превышены лимиты запросов или требуется оптимизация.",
+    "user_internal_server_error_generic": "Не удалось выполнить транскрипцию из-за внутренней ошибки сервиса. Пожалуйста, попробуйте позже.",
+    "admin_internal_server_error_notification": "Внимание! Speechmatics API вернул ошибку 500 (Internal Server Error). Возможно, временные проблемы на стороне сервиса."
 }

@@ -1,3 +1,7 @@
 *.dll filter=lfs diff=lfs merge=lfs -text
 bin/linux/ffmpeg/bin/* filter=lfs diff=lfs merge=lfs -text
 bin/windows/ffmpeg/bin/* filter=lfs diff=lfs merge=lfs -text
+*.py linguist-language=Python
+bin/* linguist-vendored
+*.dll linguist-vendored
+*.exe linguist-vendored

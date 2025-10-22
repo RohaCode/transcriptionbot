@@ -173,7 +173,7 @@ async def handle_file_for_transcription(message: Message, state: FSMContext):
                     result_text=transcription_text
                 )
                 await deduct_minutes_from_balance(db, user.telegram_id, cost_minutes)
-        else:
+        elif transcription_error_message: # Only send message if there's an actual error message to display
             async with get_async_db() as db:
                 await update_transcription_status_and_result(
                     db=db,

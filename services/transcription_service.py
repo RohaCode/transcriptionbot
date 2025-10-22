@@ -20,6 +20,16 @@ from utils.language import get_text
 logger = logging.getLogger(__name__)
 
 
+async def _notify_admins(bot: Bot, message_key: str, language: str = "ru", **kwargs):
+    """Sends a message to all configured admin IDs."""
+    admin_message = get_text(message_key, language).format(**kwargs)
+    for admin_id in settings.admin_ids:
+        try:
+            await bot.send_message(chat_id=admin_id, text=admin_message)
+        except Exception as e:
+            logger.error(f"Failed to send admin notification to {admin_id}: {e}")
+
+
 @log_exceptions
 async def transcribe_audio_file_with_progress(
     db: AsyncSession,
@@ -66,7 +76,18 @@ async def transcribe_audio_file_with_progress(
                     response_text = await response.text()
 
                     logger.info(f"Speechmatics POST response status: {response_status}")
-                    if response_status not in [200, 201]:
+                    if response_status in [401, 403, 429, 500]:
+                        admin_message_key = "admin_api_key_invalid" if response_status in [401, 403] else (
+                            "admin_rate_limited_notification" if response_status == 429 else "admin_internal_server_error_notification"
+                        )
+                        user_message_key = "user_transcription_failed_generic" if response_status in [401, 403] else (
+                            "user_rate_limited_generic" if response_status == 429 else "user_internal_server_error_generic"
+                        )
+                        await _notify_admins(bot, admin_message_key, language)
+                        user_error_msg = get_text(user_message_key, language)
+                        logger.error(f"Speechmatics API error ({response_status}). Admin notified. User: {progress_message.from_user.id}")
+                        return None, user_error_msg
+                    elif response_status not in [200, 201]:
                         error_msg = f"Ошибка при отправке файла на транскрипцию: {response_status}, {response_text}"
                         logger.error(error_msg)
                         return None, error_msg
@@ -83,7 +104,7 @@ async def transcribe_audio_file_with_progress(
         logger.info(f"Transcription job created with ID: {job_id}")
 
         plain_text, error_msg = await wait_for_transcription_with_progress(
-            db, job_id, api_key, bot, progress_message, original_filename
+            db, job_id, api_key, bot, progress_message, original_filename, language
         )
 
         return plain_text, error_msg
@@ -112,6 +133,7 @@ async def wait_for_transcription_with_progress(
     bot: Bot,
     progress_message: Message,
     original_filename: str,
+    language: str = "ru",
 ) -> Tuple[Optional[str], Optional[str]]:
     # Ожидание завершения транскрипции с обновлением прогресса.
     # Возвращает кортеж: (текст транскрипции, сообщение об ошибке) или (None, сообщение об ошибке).
@@ -140,6 +162,29 @@ async def wait_for_transcription_with_progress(
                                 item.get("alternatives", [{}])[0].get("content", "")
                                 for item in result_data.get("results", [])
                             ).strip()
+
+                            if not plain_text:
+                                if bot and progress_message:
+                                    from utils.language import get_user_language_from_db
+                                    lang = await get_user_language_from_db(db, progress_message.from_user.id)
+                                    no_text_message = get_text("transcription_no_text_found", lang)
+                                    main_keyboard = get_main_keyboard(lang) # Get keyboard here
+
+                                    try:
+                                        await bot.delete_message( # Delete the progress message
+                                            chat_id=progress_message.chat.id,
+                                            message_id=progress_message.message_id,
+                                        )
+                                    except Exception as e:
+                                        logger.warning(f"Не удалось удалить сообщение о прогрессе: {e}")
+
+                                    await bot.send_message( # Send new message with error and keyboard
+                                        chat_id=progress_message.chat.id,
+                                        text=no_text_message,
+                                        reply_markup=main_keyboard,
+                                    )
+                                logger.warning(f"No text found in transcription for job {job_id}. User: {progress_message.from_user.id}")
+                                return None, None # Return None for error_message to indicate user message was sent
 
                             if bot and progress_message:
                                 from utils.language import (
@@ -183,6 +228,17 @@ async def wait_for_transcription_with_progress(
 
                             return plain_text, None
 
+                        elif response_status in [401, 403, 429, 500]:
+                            admin_message_key = "admin_api_key_invalid" if response_status in [401, 403] else (
+                                "admin_rate_limited_notification" if response_status == 429 else "admin_internal_server_error_notification"
+                            )
+                            user_message_key = "user_transcription_failed_generic" if response_status in [401, 403] else (
+                                "user_rate_limited_generic" if response_status == 429 else "user_internal_server_error_generic"
+                            )
+                            await _notify_admins(bot, admin_message_key, language)
+                            user_error_msg = get_text(user_message_key, language)
+                            logger.error(f"Speechmatics API error ({response_status}) during status check. Admin notified. User: {progress_message.from_user.id}")
+                            return None, user_error_msg
                         elif response_status == 404:
                             logger.info(
                                 f"Transcription not ready for job {job_id}. Status: running."
