@@ -54,10 +54,10 @@ async def handle_message_without_state(message: Message, state: FSMContext):
         async with get_async_db() as db:
             lang = await get_user_language_from_db(db, message.from_user.id)
             text = get_text("this_does_not_work", lang)
-            await message.answer(text)
+            await message.answer(text, reply_markup=get_main_keyboard(lang)) # Added keyboard
     # Во всех остальных случаях отвечаем, что команда не распознана
     else:
         async with get_async_db() as db:
             lang = await get_user_language_from_db(db, message.from_user.id)
             text = get_text("unknown_command", lang)
-            await message.answer(text)
+            await message.answer(text, reply_markup=get_main_keyboard(lang)) # Added keyboard
